@@ -1,0 +1,330 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Create Elastifile Cloud File System",
+  "Mappings": {
+    "EmsAMIs": {
+      "us-east-1": {
+        "Name": "ami-06bb616e9e66d38d6"
+      },
+      "us-east-2": {
+        "Name": "ami-06bb616e9e66d38d6"
+      },
+      "us-west-1": {
+        "Name": "ami-0461a63ffb57cdeaa"
+      },
+      "us-west-2": {
+        "Name": "ami-0461a63ffb57cdeaa"
+      }
+    },
+    "EnodeAMIs": {
+      "us-east-1": {
+        "Name": "ami-0be41cde0e88c4774"
+      },
+      "us-east-2": {
+        "Name": "ami-dd"
+      },
+      "us-west-1": {
+        "Name": "ami-0309e546a5db50640"
+      },
+      "us-west-2": {
+        "Name": "ami-0309e546a5db50640"
+      }
+    }
+  },
+  "Outputs": {
+    "EmanageInstanceID": {
+      "Description": "EMS Instance ID",
+      "Value": {
+        "Ref": "EManageInstance"
+      }
+    },
+    "EmanagePrivateURL": {
+      "Description": "EMS web private URL",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": [
+                "EManageInstance",
+                "PrivateIp"
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "EmanagePubIP": {
+      "Description": "EMS web public IP",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": [
+                "EManageInstance",
+                "PublicIp"
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "EmanagePubURL": {
+      "Description": "EMS web public URL",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": [
+                "EManageInstance",
+                "PublicDnsName"
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "EmanageSSH": {
+      "Description": "EMS ssh",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "ssh centos@",
+            {
+              "Fn::GetAtt": [
+                "EManageInstance",
+                "PublicDnsName"
+              ]
+            },
+            " -i ",
+            {
+              "Ref": "KeyName"
+            },
+            ".pem"
+          ]
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "InstanceType": {
+      "AllowedValues": [
+        "t2.xlarge"
+      ],
+      "Default": "t2.xlarge",
+      "Description": "EC2 instance specs configuration",
+      "Type": "String"
+    },
+    "KeyName": {
+      "Description": "EC2 Instance SSH Key",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "SSHLocation": {
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x.",
+      "Description": "The IP address range that can be used to SSH to the EC2 instances",
+      "MaxLength": "18",
+      "MinLength": "9",
+      "Type": "String"
+    },
+    "Subnets": {
+      "Description": "SubnetIds in your Virtual Private Cloud (VPC).",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "VpcId": {
+      "Description": "Choose VPC",
+      "Type": "AWS::EC2::VPC::Id"
+    }
+  },
+  "Resources": {
+    "ECFSIngress1": {
+      "Properties": {
+        "GroupId": {
+          "Ref": "ECFSSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": 443,
+        "ToPort": 443,
+        "CidrIp": "0.0.0.0/0"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "ECFSIngress2": {
+      "Properties": {
+        "GroupId": {
+          "Ref": "ECFSSecurityGroup"
+        },
+        "CidrIp": {
+          "Ref": "SSHLocation"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": 22,
+        "ToPort": 22
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "ECFSIngress3": {
+      "Properties": {
+        "GroupId": {
+          "Ref": "ECFSSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": 8000,
+        "ToPort": 60000,
+        "CidrIp": "0.0.0.0/0"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "ECFSIngress4": {
+      "Properties": {
+        "GroupId": {
+          "Ref": "ECFSSecurityGroup"
+        },
+        "IpProtocol": "udp",
+        "FromPort": 0,
+        "ToPort": 65535,
+        "CidrIp": "0.0.0.0/0"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "ECFSIngress5": {
+      "Properties": {
+        "GroupId": {
+          "Ref": "ECFSSecurityGroup"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": -1,
+        "ToPort": -1,
+        "CidrIp": "0.0.0.0/0"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "ECFSSecurityGroup": {
+      "Properties": {
+        "GroupDescription": "Elastifile",
+        "VpcId": {
+          "Ref": "VpcId"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "EManageElasticIp": {
+      "Properties": {
+        "Domain": "vpc",
+        "InstanceId": {
+          "Ref": "EManageInstance"
+        }
+      },
+      "Type": "AWS::EC2::EIP"
+    },
+    "EManageInstance": {
+      "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 100,
+              "VolumeType": "gp2"
+            }
+          }
+        ],
+        "IamInstanceProfile": {
+          "Ref": "ElastifileProfile"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "EmsAMIs",
+            {
+              "Ref": "AWS::Region"
+            },
+            "Name"
+          ]
+        },
+        "InstanceType": "t2.xlarge",
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "Monitoring": true,
+        "SecurityGroupIds": [
+          {
+            "Ref": "ECFSSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "Subnets"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Elastifile-EMS"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "sed -i 's/^ami=.*$/ami=",
+                {
+                  "Fn::FindInMap": [
+                    "EnodeAMIs",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "Name"
+                  ]
+                },
+                "/g' /elastifile/emanage/deployment/cloud/init_cloud_amazon.sh\n",
+                "sed -i 's/^storage_type=.*$/storage_type=persistent/g' /elastifile/emanage/deployment/cloud/init_cloud_amazon.sh\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Type": "AWS::EC2::Instance"
+    },
+    "ElastifileProfile": {
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "ElastifileRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::InstanceProfile"
+    },
+    "ElastifileRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+        ],
+        "Path": "/"
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
