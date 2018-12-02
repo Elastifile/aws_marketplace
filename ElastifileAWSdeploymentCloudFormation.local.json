@@ -4,30 +4,18 @@
   "Mappings": {
     "EmsAMIs": {
       "us-east-1": {
-        "Name": "ami-06bb616e9e66d38d6"
-      },
-      "us-east-2": {
-        "Name": "ami-06bb616e9e66d38d6"
-      },
-      "us-west-1": {
-        "Name": "ami-0461a63ffb57cdeaa"
+        "Name": "ami-05367b7fd7605082c"
       },
       "us-west-2": {
-        "Name": "ami-0461a63ffb57cdeaa"
+        "Name": "ami-0fddf78605bf9a2ba"
       }
     },
     "EnodeAMIs": {
       "us-east-1": {
-        "Name": "ami-0096ba6a1ca2426d8"
-      },
-      "us-east-2": {
-        "Name": "ami-0096ba6a1ca2426d8"
-      },
-      "us-west-1": {
-        "Name": "ami-0309e546a5db50640"
+        "Name": "ami-0b193568eb2b7db2f"
       },
       "us-west-2": {
-        "Name": "ami-0309e546a5db50640"
+        "Name": "ami-0ac9e15feb09017ad"
       }
     }
   },
