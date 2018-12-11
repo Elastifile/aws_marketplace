@@ -110,7 +110,7 @@
       "Type": "String"
     },
     "KeyName": {
-      "Description": "EC2 Instance SSH Key",
+      "Description": "EC2 KeyPair to enable SSH access to the instance",
       "Type": "AWS::EC2::KeyPair::KeyName"
     },
     "SSHLocation": {
@@ -123,10 +123,11 @@
     },
     "Subnets": {
       "Description": "SubnetIds in your Virtual Private Cloud (VPC).",
+      "ConstraintDescription": "Must be an existing Subnet.",
       "Type": "AWS::EC2::Subnet::Id"
     },
     "VpcId": {
-      "Description": "Choose VPC",
+      "Description": "VPCId of Virtual Private Cloud (VPC).",
       "Type": "AWS::EC2::VPC::Id"
     }
   },
