@@ -4,15 +4,12 @@
   "Mappings": {
     "EmsAMIs": {
       "us-east-1": {
-        "Name": "ami-05367b7fd7605082c"
-      },
-      "us-west-2": {
-        "Name": "ami-0fddf78605bf9a2ba"
+        "Name": "ami-096748cc59db1051f"
       }
     },
     "EnodeAMIs": {
       "us-east-1": {
-        "Name": "ami-052459cfdee1e9555"
+        "Name": "ami-04521eba5c04778dc"
       },
       "us-west-2": {
         "Name": "ami-0b01437811f62a808"
