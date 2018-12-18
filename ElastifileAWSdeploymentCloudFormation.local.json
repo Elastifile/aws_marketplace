@@ -5,6 +5,9 @@
     "EmsAMIs": {
       "us-east-1": {
         "Name": "ami-096748cc59db1051f"
+      },
+      "us-west-2": {
+        "Name": "ami-0c4775b15c976b8ef"
       }
     },
     "EnodeAMIs": {
@@ -12,7 +15,7 @@
         "Name": "ami-0e826ea3a9b7146c7"
       },
       "us-west-2": {
-        "Name": "ami-0ac9e15feb09017ad"
+        "Name": "ami-09cf0c92feb69ef69"
       }
     }
   },
